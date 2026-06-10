@@ -5,7 +5,17 @@ is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 project adheres to [Semantic Versioning](https://semver.org). See
 [VERSIONING.md](./VERSIONING.md) for how changes are classified.
 
-## [0.1.0] - Unreleased
+## [0.1.1] - 2026-06-10
+
+### Added
+- The package is now **importable at runtime**: `@agentcompose/spec` ships a
+  compiled entry exporting the canonical schemas as objects (`schemas`,
+  `schemaList`, `schemaIds`), a `schemaFor(idOrName)` lookup, `registerSchemas(ajv)`
+  to load them (with cross-`$ref`s) into a validator, and `SCHEMA_BASE` /
+  `AGENTCOMPOSE_VERSION` constants. The JSON files remain available under the
+  `./schemas/*` subpath. No contract/schema changes.
+
+## [0.1.0] - 2026-06-10
 
 First release of the AgentCompose contract: a language-neutral, schema-first
 protocol for configuring autonomous agents as **reusable components** and

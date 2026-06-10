@@ -5,3 +5,4 @@ types/
 .DS_Store
 .env
 .env.*
+src/schemas.generated.ts

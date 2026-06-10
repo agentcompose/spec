@@ -48,6 +48,27 @@ graph TB
     SCHEMAS -. validates .-> RT[engine runtime]
 ```
 
+## Use it from code
+
+The schemas are the source of truth; this package exports them so runtimes can
+validate against the **canonical** definitions instead of hand-copied shapes:
+
+```ts
+import Ajv from "ajv/dist/2020.js";
+import addFormats from "ajv-formats";
+import { registerSchemas, SCHEMA_BASE } from "@agentcompose/spec";
+
+const ajv = addFormats(new Ajv({ strict: false }));
+registerSchemas(ajv); // loads every schema so cross-$refs (e.g. Part) resolve
+
+const validate = ajv.getSchema(`${SCHEMA_BASE}task-submit.json`)!;
+validate({ goal: [{ kind: "text", text: "summarize agent interop" }] }); // true
+```
+
+Also exported: `schemas` (by `$id`), `schemaList`, `schemaIds`, `schemaFor(idOrName)`,
+and `AGENTCOMPOSE_VERSION`. The raw JSON is still available under `@agentcompose/spec/schemas/*`.
+The TypeScript SDK uses exactly this to validate inbound wire messages.
+
 ## Core concepts (at a glance)
 
 - **Agent (component)** — a reusable, configurable component that solves a class of

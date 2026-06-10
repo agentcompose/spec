@@ -1,18 +1,35 @@
 {
   "name": "@agentcompose/spec",
-  "version": "0.1.0",
-  "description": "The AgentCompose contract: JSON Schemas and normative specification.",
+  "version": "0.1.1",
+  "description": "The AgentCompose contract: JSON Schemas and normative specification, importable for runtime validation.",
   "license": "Apache-2.0",
   "homepage": "https://agentcompose.dev",
   "repository": { "type": "git", "url": "git+https://github.com/agentcompose/spec.git" },
   "type": "module",
-  "files": ["schemas", "spec"],
+  "engines": { "node": ">=18.19" },
+  "files": ["dist", "schemas", "spec", "openrpc.json", "CHANGELOG.md", "LICENSE"],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./schemas/*": "./schemas/*",
+    "./openrpc.json": "./openrpc.json"
+  },
   "scripts": {
+    "gen:schemas": "node scripts/gen-schemas.mjs",
     "validate": "node scripts/validate.mjs",
-    "test": "npm run validate"
+    "build": "npm run gen:schemas && rm -rf dist && tsc -p tsconfig.build.json",
+    "prepublishOnly": "npm run build",
+    "test": "npm run validate",
+    "typecheck": "npm run gen:schemas && tsc --noEmit"
   },
   "devDependencies": {
     "ajv": "^8.17.1",
-    "ajv-formats": "^3.0.1"
+    "ajv-formats": "^3.0.1",
+    "typescript": "^5.9.0",
+    "@types/node": "^22.0.0"
   }
 }
