@@ -31,6 +31,8 @@ AgentCompose binds its method catalog ([`openrpc.json`](../openrpc.json)) to
 
 | Method | Params schema | Result | Streaming |
 |--------|---------------|--------|-----------|
+| `agent/describe` | _(none)_ | `agent-descriptor.json` | no |
+| `agent/configure` | `agent-configure.json` | effective config | no |
 | `tasks/submit` | `task-submit.json` | `task.json` | no |
 | `tasks/get` | `task-ref.json` | `task.json` | no |
 | `tasks/cancel` | `task-ref.json` | `task.json` | no |
@@ -112,6 +114,7 @@ error). AgentCompose reserves codes `-32000`..`-32099`:
 | -32004 | RateLimited | Caller exceeded a rate limit. |
 | -32005 | InvalidState | Operation not valid for the task's current state (e.g. provideInput when not input-required). |
 | -32006 | UnsupportedVersion | The agent cannot serve the request under a compatible contract major version. |
+| -32007 | InvalidConfiguration | Supplied configuration failed validation against the agent's configSchema. |
 
 Standard JSON-RPC codes (`-32600`..`-32603`, `-32700`) apply for protocol-level
 errors.

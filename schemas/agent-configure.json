@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentcompose.dev/schemas/agent-configure.json",
+  "title": "Configure Params",
+  "description": "Params for the agent/configure method. Supplies configuration values for a configured instance; the agent MUST validate them against its advertised configSchema.",
+  "type": "object",
+  "required": ["config"],
+  "additionalProperties": false,
+  "properties": {
+    "config": {
+      "type": "object",
+      "description": "Configuration values, merged over the agent's configSchema defaults. MUST validate against the agent's configSchema. Secret values MUST be passed as SecretRef, never inline.",
+      "additionalProperties": true
+    }
+  }
+}

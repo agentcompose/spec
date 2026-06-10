@@ -10,8 +10,14 @@
 ## What this repo is
 
 This repository is the **source of truth** for the AgentCompose contract. It defines
-*how* agents and orchestrators interact — not *how* an agent is implemented
-internally.
+*how* agents are configured and interacted with — not *how* an agent is
+implemented internally.
+
+An AgentCompose agent is a **reusable, configurable component**: it ships with
+defaults and declares a typed configuration surface (model/provider, system
+prompt, tools, resources, limits). The contract standardizes that **configuration
+surface** and the **interaction surface** (goals in, results out); the agent's
+internals stay private.
 
 It contains:
 
@@ -37,22 +43,29 @@ graph TB
 
 ## Core concepts (at a glance)
 
-- **Agent** — an autonomous component that solves a class of problems. Receives
-  **goals, not instructions**. Owns its own models, prompts, memory, tools.
-- **Agent Descriptor** — public metadata + capabilities an agent advertises.
-- **Task** — a unit of work submitted to an agent toward a goal.
+- **Agent (component)** — a reusable, configurable component that solves a class of
+  problems. Receives **goals, not instructions**. Internals private; configuration
+  surface declared.
+- **Agent Descriptor** — public metadata, capabilities, and `configSchema` an agent
+  advertises.
+- **Configuration** — typed values (with defaults) supplied at instantiation;
+  validated against the agent's `configSchema`.
+- **Configured instance** — a component bound to a configuration, against which
+  tasks run.
+- **Task** — a unit of work submitted to a configured instance toward a goal.
 - **Task Lifecycle** — the state machine a task moves through.
 - **Artifact** — a tangible output produced during/after a task.
-- **Orchestrator** — composes multiple agents into a workflow. A client of the
-  contract, not part of an agent's internals.
+- **Orchestrator** — configures and composes agents into a workflow. A client of
+  the contract, not part of an agent's internals.
 
 ## The contract surface
 
-Every compliant agent exposes these capabilities over the transport binding:
+Every compliant agent exposes these over the transport binding:
 
 | Surface | Method | Description |
 |---------|--------|-------------|
-| Discovery | `agent/describe` / well-known URL | Advertise metadata + capabilities |
+| Discovery | `agent/describe` / well-known URL | Advertise metadata, capabilities, configSchema |
+| Configuration | `agent/configure` | Supply typed config to instantiate an instance |
 | Task submission | `tasks/submit` | Accept a goal, begin work |
 | Task query | `tasks/get` | Fetch current task state |
 | Provide input | `tasks/provideInput` | Resume a task waiting on input |
@@ -61,8 +74,9 @@ Every compliant agent exposes these capabilities over the transport binding:
 
 The contract is **transport-neutral**, with two bindings:
 [HTTP](./spec/transport.md) (network, SSE) and
-[stdio](./spec/transport-stdio.md) (local subprocess, NDJSON). See
-[`spec/specification.md`](./spec/specification.md) for normative detail.
+[stdio](./spec/transport-stdio.md) (local subprocess, NDJSON). Configuration is
+normative in [`spec/configuration.md`](./spec/configuration.md); the full contract
+in [`spec/specification.md`](./spec/specification.md).
 
 ## Versioning
 

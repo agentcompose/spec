@@ -8,20 +8,36 @@ project adheres to [Semantic Versioning](https://semver.org). See
 ## [0.1.0] - Unreleased
 
 First release of the AgentCompose contract: a language-neutral, schema-first
-protocol for submitting goals to autonomous agents and composing them.
+protocol for configuring autonomous agents as **reusable components** and
+composing them.
+
+### Component model
+- Agents are **reusable, configurable components**: internals stay private; the
+  **configuration surface** (model/provider, system prompt, tools, resources,
+  limits) is public, typed, and declared. Component → configured instance → tasks.
+
+### Configuration
+- `configSchema` on the descriptor (JSON Schema + `default`s) declares accepted
+  configuration; `agent/configure` supplies values, validated, returning the
+  effective config (secrets redacted) or `-32007 InvalidConfiguration`.
+- Well-known config vocabulary (`schemas/config.json`): `Provider` (selection and
+  bring-your-own-model injection), `SystemPrompt`, `Sampling`, `ToolGrant`,
+  `ResourceRef`, `Limits`, and `SecretRef` (secrets by reference, never inline).
+- Normative `spec/configuration.md`; instantiation lifecycle and per-binding
+  config delivery (stdio: `agent/configure` after spawn, secrets via env).
 
 ### Core model
 - Concepts, agent descriptor, capabilities, tasks, and the task lifecycle state
   machine (`submitted`, `working`, `input-required`, `completed`, `failed`,
   `canceled`).
 - JSON Schemas: descriptor, capability, task, task-submit, task-ref, task-provide-input,
-  artifact, result, error, event, common, and JSON-RPC envelopes (`jsonrpc.json`,
-  including the `Message` union).
+  artifact, result, error, event, common, config, agent-configure, and JSON-RPC
+  envelopes (`jsonrpc.json`, including the `Message` union).
 
 ### Methods
-- `agent/describe`, `tasks/submit`, `tasks/get`, `tasks/cancel`,
-  `tasks/provideInput`, `tasks/subscribe`, published as an OpenRPC catalog
-  (`openrpc.json`).
+- `agent/describe`, `agent/configure`, `tasks/submit`, `tasks/get`,
+  `tasks/cancel`, `tasks/provideInput`, `tasks/subscribe`, published as an OpenRPC
+  catalog (`openrpc.json`).
 - `tasks/submit` always returns a Task; async by default, may return a terminal
   state for fast work. Optional `idempotencyKey` makes submission safe to retry.
 - `tasks/provideInput` resolves the `input-required` state.

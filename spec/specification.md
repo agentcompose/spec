@@ -12,23 +12,39 @@ document are to be interpreted as described in [RFC 2119](https://www.rfc-editor
 
 ## 1. Introduction
 
-AgentCompose defines a minimal, transport-bound contract that allows independently
-developed **autonomous agents** to participate in larger workflows orchestrated by
-any compliant **orchestrator**.
+AgentCompose defines a contract that lets independently developed **autonomous
+agents** be reused as **configurable components** and composed into larger
+workflows by any compliant **orchestrator**.
 
-The contract deliberately governs only the **interaction surface** between agents
-and orchestrators. It does **not** constrain an agent's internal implementation —
-its models, prompts, memory, planning, tools, sub-agents, or execution strategy.
+An agent is a reusable component much like a container image or a Terraform
+module: it ships with sensible **defaults** and exposes a set of **typed, declared
+configuration knobs** a consumer sets when instantiating it. The contract governs
+two surfaces:
+
+- the **configuration surface** — how a component declares its knobs and how a
+  consumer supplies values (§8, [`configuration.md`](./configuration.md)); and
+- the **interaction surface** — how goals are submitted to a configured instance
+  and results stream back (§5–§7).
+
+The contract draws a deliberate line through the agent:
+
+| Aspect | Status |
+|--------|--------|
+| **How the agent works inside** — planning, internal prompts, how it calls a model, sub-agents | **Private.** The contract does not constrain it. |
+| **Its configurable surface** — model/provider, system-prompt additions, granted tools, context resources, limits | **Public, typed, declared.** Standardized by the contract. |
+
+The agent's internals stay a black box; its configuration ports do not.
 
 ### 1.1 Design goals
 
-1. **Autonomy** — agents receive goals, not step-by-step instructions.
-2. **Separation of concerns** — agents own *execution*; orchestrators own
+1. **Reusability** — agents are configurable components, runnable as-is or tuned.
+2. **Autonomy** — agents receive goals, not step-by-step instructions.
+3. **Separation of concerns** — agents own *execution*; orchestrators own
    *coordination*.
-3. **Composability** — agents can be assembled into multi-step workflows.
-4. **Implementation agnosticism** — local or remote, OSS or proprietary, any
+4. **Composability** — configured instances can be assembled into workflows.
+5. **Implementation agnosticism** — local or remote, OSS or proprietary, any
    language or framework, as long as the contract is honored.
-5. **Extensibility** — the contract evolves without breaking existing agents.
+6. **Extensibility** — the contract evolves without breaking existing agents.
 
 ### 1.2 Relationship to other standards
 
@@ -48,8 +64,9 @@ common to these standards.
 
 | Role | Definition |
 |------|------------|
-| **Agent** | A networked component that accepts goals and performs work autonomously. |
-| **Orchestrator** | A client that discovers agents and composes them into workflows. |
+| **Agent** | A reusable, configurable component that accepts goals and performs work autonomously. |
+| **Configured instance** | An agent component bound to a specific configuration, against which tasks run. |
+| **Orchestrator** | A client that configures agents and composes them into workflows. |
 | **Registry** | An OPTIONAL service that catalogs Agent Descriptors for discovery. |
 
 An orchestrator MAY itself be exposed as an agent (recursive composition).
@@ -85,8 +102,8 @@ Agents **MAY** support the `agent/describe` method under any binding. The respon
 
 ### 3.3 Optional fields
 
-`description`, `provider`, `documentationUrl`, `iconUrl`, `auth` (see §7),
-`extensions` (free-form, namespaced).
+`description`, `provider`, `documentationUrl`, `iconUrl`, `auth` (see §9),
+`taskRetention`, `configSchema` (see §8), `extensions` (free-form, namespaced).
 
 ---
 
@@ -210,6 +227,7 @@ The method catalog is identical across bindings:
 | Method | Params | Result |
 |--------|--------|--------|
 | `agent/describe` | _(none)_ | Agent Descriptor |
+| `agent/configure` | [`agent-configure.json`](../schemas/agent-configure.json) | Effective configuration |
 | `tasks/submit` | [`task-submit.json`](../schemas/task-submit.json) | Task |
 | `tasks/get` | [`task-ref.json`](../schemas/task-ref.json) | Task |
 | `tasks/cancel` | [`task-ref.json`](../schemas/task-ref.json) | Task |
@@ -258,7 +276,28 @@ Errors **MUST** use JSON-RPC error objects. AgentCompose reserves the range
 
 ---
 
-## 8. Authentication
+## 8. Configuration
+
+Agents are **reusable components**: they ship with defaults and expose a typed,
+declared configuration surface. A configurable agent **MUST** advertise a
+`configSchema` (JSON Schema, draft 2020-12) in its descriptor, and a consumer
+supplies values with the `agent/configure` method before submitting tasks.
+
+The agent **MUST** validate supplied configuration against its `configSchema`,
+**MUST** run on defaults when none is supplied, and **MUST** return
+`-32007 InvalidConfiguration` on validation failure. Secret values **MUST** be
+passed by reference (`SecretRef`), never inline, and **MUST NOT** be echoed back.
+
+Well-known configuration keys (`provider`, `systemPrompt`, `sampling`, `tools`,
+`resources`, `limits`) are shared shapes agents **SHOULD** reuse so tooling can
+recognize them. The `provider` key supports both provider **selection** and
+provider **injection** (bring-your-own-model). The full model — declaration,
+supply, scope per binding, and conformance — is normative in
+[`configuration.md`](./configuration.md).
+
+---
+
+## 9. Authentication
 
 Agents **MAY** require authentication, declared in the descriptor's `auth` field.
 Transport security (TLS) is **REQUIRED** for any non-`none` scheme. Credentials
@@ -275,7 +314,7 @@ On missing or invalid credentials an agent **MUST** return `-32003 AuthRequired`
 
 ---
 
-## 9. Extensibility
+## 10. Extensibility
 
 - All objects **MAY** carry an `extensions` object with namespaced, reverse-DNS
   keys. Consumers **MUST** ignore unknown extensions.
@@ -286,7 +325,7 @@ See [`VERSIONING.md`](../VERSIONING.md).
 
 ---
 
-## 10. Security considerations
+## 11. Security considerations
 
 - **Transport security.** Any non-`none` auth scheme **MUST** operate over TLS.
   Credentials **MUST** be carried in the `Authorization` header, never in the
@@ -305,15 +344,17 @@ See [`VERSIONING.md`](../VERSIONING.md).
 
 ---
 
-## 11. Conformance
+## 12. Conformance
 
 An implementation is **conformant** if it:
 
 1. Serves a valid Agent Descriptor.
 2. Implements all required transport methods, including `tasks/provideInput`
    whenever it can emit the `input-required` state.
-3. Produces payloads that validate against the published schemas.
-4. Honors the task lifecycle transition rules and the transport binding
+3. If configurable, advertises a valid `configSchema`, validates supplied
+   configuration, and returns `-32007` on failure (see [`configuration.md`](./configuration.md)).
+4. Produces payloads that validate against the published schemas.
+5. Honors the task lifecycle transition rules and the transport binding
    ([`spec/transport.md`](./transport.md)).
 
 Conformance test vectors live in [`examples/`](../examples).

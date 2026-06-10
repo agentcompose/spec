@@ -14,6 +14,12 @@
       "result": { "name": "descriptor", "schema": { "$ref": "https://agentcompose.dev/schemas/agent-descriptor.json" } }
     },
     {
+      "name": "agent/configure",
+      "summary": "Supply configuration for a configured instance. The agent MUST validate against its advertised configSchema and return the effective configuration (secret values redacted), or -32007 InvalidConfiguration. SHOULD be called before the first tasks/submit.",
+      "params": [ { "name": "params", "schema": { "$ref": "https://agentcompose.dev/schemas/agent-configure.json" } } ],
+      "result": { "name": "effectiveConfig", "schema": { "type": "object" } }
+    },
+    {
       "name": "tasks/submit",
       "summary": "Submit a goal and create a new task.",
       "params": [

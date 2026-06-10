@@ -16,5 +16,21 @@
   ],
   "endpoint": "https://research.example.com/agentcompose",
   "auth": { "type": "bearer", "description": "Bearer token issued by the provider." },
+  "taskRetention": 86400,
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "depth": {
+        "type": "string",
+        "enum": ["shallow", "deep"],
+        "default": "shallow",
+        "description": "How thoroughly to research."
+      },
+      "systemPrompt": { "$ref": "https://agentcompose.dev/schemas/config.json#/$defs/SystemPrompt" },
+      "provider": { "$ref": "https://agentcompose.dev/schemas/config.json#/$defs/Provider" },
+      "limits": { "$ref": "https://agentcompose.dev/schemas/config.json#/$defs/Limits" }
+    }
+  },
   "documentationUrl": "https://research.example.com/docs"
 }

@@ -40,6 +40,7 @@ const get = (id) => {
 // 2. Positive examples: { file: schema $id (with optional #fragment) }.
 const positives = {
   "agent-descriptor.example.json": B + "agent-descriptor.json",
+  "agent-configure.example.json": B + "agent-configure.json",
   "task-submit.example.json": B + "task-submit.json",
   "task-submit-idempotent.example.json": B + "task-submit.json",
   "task.example.json": B + "task.json",
@@ -78,7 +79,13 @@ const negatives = [
   { name: "provideInput with empty input", id: B + "task-provide-input.json",
     data: { id: "t", input: [] } },
   { name: "oauth2 auth without metadataUrl", id: B + "common.json#/$defs/AuthScheme",
-    data: { type: "oauth2" } }
+    data: { type: "oauth2" } },
+  { name: "secret ref without secretRef key", id: B + "config.json#/$defs/SecretRef",
+    data: { value: "inline-secret" } },
+  { name: "limits with negative budget", id: B + "config.json#/$defs/Limits",
+    data: { maxBudgetUsd: -1 } },
+  { name: "configure params missing config", id: B + "agent-configure.json",
+    data: {} }
 ];
 
 for (const { name, id, data } of negatives) {

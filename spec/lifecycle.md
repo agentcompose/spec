@@ -2,6 +2,12 @@
 
 This document defines the normative state machine for an AgentCompose **Task**.
 
+> An agent has two lifecycles. First it is **instantiated** — configured from its
+> defaults and any supplied values (see [`configuration.md`](./configuration.md)).
+> Then the resulting **configured instance** runs **tasks**, each of which moves
+> through the state machine below. This document covers the second; configuration
+> covers the first.
+
 ## States
 
 | State | Terminal | Description |

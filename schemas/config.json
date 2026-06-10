@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentcompose.dev/schemas/config.json",
+  "title": "Configuration Vocabulary",
+  "description": "OPTIONAL well-known configuration keys an agent MAY incorporate into its own configSchema, so cross-agent tooling can recognize common knobs uniformly (semantic conventions). An agent's effective configSchema is its own; these are shared shapes, not a required envelope.",
+  "$defs": {
+    "SecretRef": {
+      "title": "Secret Reference",
+      "description": "A reference to a secret resolved by the host out of band (e.g. an environment variable or secret-store key). Secret values MUST NOT be passed inline in configuration.",
+      "type": "object",
+      "required": ["secretRef"],
+      "additionalProperties": false,
+      "properties": {
+        "secretRef": {
+          "type": "string",
+          "description": "Name/key the host resolves to a secret value (e.g. an env var name).",
+          "examples": ["OPENAI_API_KEY"]
+        }
+      }
+    },
+    "Provider": {
+      "title": "Model Provider Binding",
+      "description": "Binds the agent to an LLM provider. Supports provider selection (name a provider the agent supports) and provider injection (supply an OpenAI-compatible endpoint so the agent runs on the consumer's account / 'bring your own model').",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "description": "Provider family. 'openai-compatible' enables injection of an arbitrary base URL.",
+          "examples": ["openai-compatible", "anthropic", "openai", "azure-openai"]
+        },
+        "model": {
+          "type": "string",
+          "description": "Model identifier within the provider.",
+          "examples": ["gpt-4o", "claude-sonnet-4"]
+        },
+        "baseUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "Endpoint for provider injection (OpenAI-compatible). When set, the agent routes LLM calls here."
+        },
+        "apiKey": {
+          "$ref": "#/$defs/SecretRef",
+          "description": "Credential for the provider, by reference."
+        }
+      }
+    },
+    "SystemPrompt": {
+      "title": "System Prompt",
+      "description": "Additional or overriding system instructions. Whether the value replaces or augments the agent's base prompt is agent-defined and SHOULD be documented by the agent.",
+      "type": "string"
+    },
+    "Sampling": {
+      "title": "Sampling Parameters",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "temperature": { "type": "number", "minimum": 0 },
+        "topP": { "type": "number", "minimum": 0, "maximum": 1 },
+        "maxOutputTokens": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "ToolGrant": {
+      "title": "Tool Grant",
+      "description": "Grants the agent access to an external tool source. 'mcp' references a Model Context Protocol server.",
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": true,
+      "properties": {
+        "type": { "type": "string", "examples": ["mcp", "http", "builtin"] },
+        "name": { "type": "string" },
+        "url": { "type": "string", "format": "uri" },
+        "command": { "type": "string", "description": "Spawn command for a local (e.g. stdio MCP) tool server." },
+        "apiKey": { "$ref": "#/$defs/SecretRef" }
+      }
+    },
+    "ResourceRef": {
+      "title": "Resource Reference",
+      "description": "A context resource (knowledge base, file, dataset) the agent may use.",
+      "type": "object",
+      "required": ["uri"],
+      "additionalProperties": false,
+      "properties": {
+        "uri": { "type": "string", "format": "uri" },
+        "mimeType": { "type": "string" },
+        "name": { "type": "string" }
+      }
+    },
+    "Limits": {
+      "title": "Resource Limits",
+      "description": "Governance bounds the agent SHOULD enforce for work done under this configuration.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "maxBudgetUsd": { "type": "number", "minimum": 0 },
+        "maxTokens": { "type": "integer", "minimum": 1 },
+        "timeoutSeconds": { "type": "integer", "minimum": 1 }
+      }
+    }
+  }
+}

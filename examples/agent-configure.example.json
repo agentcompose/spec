@@ -1,0 +1,13 @@
+{
+  "config": {
+    "depth": "deep",
+    "systemPrompt": "Prioritize primary sources and note publication dates.",
+    "provider": {
+      "kind": "openai-compatible",
+      "model": "gpt-4o",
+      "baseUrl": "https://llm.internal.example.com/v1",
+      "apiKey": { "secretRef": "INTERNAL_LLM_KEY" }
+    },
+    "limits": { "maxBudgetUsd": 0.5, "timeoutSeconds": 120 }
+  }
+}

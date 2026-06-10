@@ -72,11 +72,26 @@ There is no well-known URL. The host **MUST** obtain the descriptor by calling t
 The descriptor's `endpoint` field is **OMITTED** for stdio-only agents. The host
 **SHOULD** call `agent/describe` first and check `agentcomposeVersion`.
 
+### 4.1 Configuration
+
+If the descriptor advertises a `configSchema`, the host **SHOULD** call
+`agent/configure` after discovery and **before** the first `tasks/submit`. One
+spawned process is **one configured instance**. Secret references in the
+configuration (`SecretRef`) **SHOULD** be resolved from the child process
+**environment** (the `secretRef` names an env var). See
+[`configuration.md`](./configuration.md).
+
+```
+→ {"jsonrpc":"2.0","id":"c1","method":"agent/configure","params":{"config":{"depth":"deep"}}}
+← {"jsonrpc":"2.0","id":"c1","result":{"depth":"deep"}}
+```
+
 ## 5. Requests and responses
 
 - The host sends Requests with a unique `id`; the agent **MUST** reply with a
   Response bearing the same `id`.
-- Methods are identical to the core catalog: `agent/describe`, `tasks/submit`,
+- Methods are identical to the core catalog: `agent/describe`, `agent/configure`,
+  `tasks/submit`,
   `tasks/get`, `tasks/cancel`, `tasks/provideInput`.
 - The agent **MAY** process requests concurrently; responses **MAY** be returned
   out of order (correlate by `id`).
