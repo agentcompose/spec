@@ -22,5 +22,5 @@ jobs:
       - run: npm install
       - run: npm run validate
       - run: npm publish --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        # Tokenless publish via OIDC trusted publishing (configure the trusted
+        # publisher for @agentcompose/spec on npmjs.com once, then no secret is needed).
