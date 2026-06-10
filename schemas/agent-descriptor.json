@@ -42,6 +42,11 @@
       "format": "uri",
       "description": "Base URL for the JSON-RPC transport."
     },
+    "taskRetention": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Minimum seconds a task remains retrievable via tasks/get after reaching a terminal state. After this window, tasks/get MAY return -32000 TaskNotFound."
+    },
     "auth": { "$ref": "https://agentcompose.dev/schemas/common.json#/$defs/AuthScheme" },
     "documentationUrl": { "type": "string", "format": "uri" },
     "iconUrl": { "type": "string", "format": "uri" },

@@ -1,0 +1,6 @@
+{
+  "goal": [
+    { "kind": "text", "text": "Summarize the AgentCompose spec in three bullets." }
+  ],
+  "idempotencyKey": "client-req-9c1f2a7e"
+}

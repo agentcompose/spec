@@ -20,6 +20,12 @@ AgentCompose binds its method catalog ([`openrpc.json`](../openrpc.json)) to
   with JSON-RPC error `-32600` (Invalid Request).
 - Unary responses **MUST** validate against `jsonrpc.json#/$defs/Response` and use
   `Content-Type: application/json`.
+- **Idempotency.** When `tasks/submit` carries an `idempotencyKey`, an agent
+  **MUST** deduplicate against tasks created within its `taskRetention` window,
+  returning the existing task. This makes `submit` safe to retry on network
+  failure.
+- **Polling.** On a non-terminal `tasks/get` response an agent **SHOULD** include
+  a `Retry-After` header (seconds) hinting when to poll next.
 
 ### 1.1 Method summary
 
@@ -48,8 +54,8 @@ Each SSE message **MUST** carry, in its `data:` field, a JSON-RPC **Notification
   [`schemas/event.json`](../schemas/event.json)
 
 The SSE `event:` field **MUST** equal the event's `type` (`status`, `progress`,
-`artifact`, `result`, `error`). Each message **MUST** include a monotonically
-increasing `id:` field.
+`message`, `artifact`, `result`, `error`). Each message **MUST** include a
+monotonically increasing `id:` field.
 
 ```
 id: 1
@@ -105,6 +111,7 @@ error). AgentCompose reserves codes `-32000`..`-32099`:
 | -32003 | AuthRequired | Authentication missing or invalid. |
 | -32004 | RateLimited | Caller exceeded a rate limit. |
 | -32005 | InvalidState | Operation not valid for the task's current state (e.g. provideInput when not input-required). |
+| -32006 | UnsupportedVersion | The agent cannot serve the request under a compatible contract major version. |
 
 Standard JSON-RPC codes (`-32600`..`-32603`, `-32700`) apply for protocol-level
 errors.

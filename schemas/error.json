@@ -14,5 +14,5 @@
     "message": { "type": "string" },
     "data": { "description": "Optional structured error detail." }
   },
-  "$comment": "Reserved AgentCompose codes: -32000 TaskNotFound, -32001 CapabilityNotSupported, -32002 InvalidGoal, -32003 AuthRequired, -32004 RateLimited, -32005 Canceled."
+  "$comment": "Reserved AgentCompose codes: -32000 TaskNotFound, -32001 CapabilityNotSupported, -32002 InvalidGoal, -32003 AuthRequired, -32004 RateLimited, -32005 InvalidState, -32006 UnsupportedVersion."
 }

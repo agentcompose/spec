@@ -126,6 +126,17 @@ Research the latest AI agent interoperability standards and summarize them.
 
 An orchestrator **MUST NOT** require the agent to follow a prescribed procedure.
 
+**Submission semantics.** `tasks/submit` **MUST** return a `Task`. Agents
+**SHOULD** return promptly with state `submitted` or `working` and continue work
+asynchronously; an agent **MAY** return a terminal state (`completed`/`failed`)
+directly for work that finishes quickly. Clients **MUST** handle a `Task` in any
+state on return.
+
+**Idempotency.** A caller **MAY** include an `idempotencyKey`. If an agent
+receives a `tasks/submit` whose key matches a task created within its retention
+window (§6.1), it **MUST** return that existing task rather than creating a new
+one. This makes `submit` safe to retry.
+
 ### 5.2 Task object
 
 The agent responds with a **Task** object that validates against
@@ -160,6 +171,19 @@ rules.
 
 Agents **MUST** emit a status update on every state transition. Agents **MAY**
 emit incremental progress and artifacts while in `working`.
+
+### 6.1 Retention
+
+After a task reaches a terminal state, the agent **MUST** keep it retrievable via
+`tasks/get` for at least the number of seconds advertised in the descriptor's
+`taskRetention` field (default: implementation-defined, **RECOMMENDED** ≥ 3600).
+Once the window elapses, `tasks/get` **MAY** return `-32000 TaskNotFound`.
+
+### 6.2 Retrieving results without streaming
+
+Clients that do not subscribe **MAY** poll `tasks/get`. Agents **SHOULD** include
+a `Retry-After` header hint on non-terminal responses. Streaming
+(`tasks/subscribe`) is the **RECOMMENDED** path; polling is a fallback.
 
 ---
 
@@ -198,11 +222,21 @@ input via the `message` field of the `status` event. The caller supplies it with
 ### 7.4 Streaming
 
 `tasks/subscribe` **MUST** be served as **Server-Sent Events**. Each event is a
-JSON-RPC notification carrying one of: `status`, `progress`, `artifact`, `result`,
-`error`. Streams **MUST** terminate after a terminal state. See
+JSON-RPC notification carrying one of: `status`, `progress`, `message`,
+`artifact`, `result`, `error`. A `message` event carries an incremental `delta`
+of the eventual result content (e.g. streamed tokens); concatenating a task's
+`message` deltas **SHOULD** reconstruct the streamed portion of the result.
+Streams **MUST** terminate after a terminal state. See
 [`spec/transport.md`](./transport.md) for the frame format.
 
-### 7.5 Errors
+### 7.5 Version negotiation
+
+A client **SHOULD** read the descriptor's `agentcomposeVersion` before calling an
+agent. If an agent receives a request it cannot serve under a compatible major
+version, it **MUST** respond with `-32006 UnsupportedVersion`. Compatibility
+follows [`VERSIONING.md`](../VERSIONING.md).
+
+### 7.6 Errors
 
 Errors **MUST** use JSON-RPC error objects. AgentCompose reserves the range
 `-32000`..`-32099` for protocol-level errors (defined in
@@ -214,8 +248,17 @@ Errors **MUST** use JSON-RPC error objects. AgentCompose reserves the range
 ## 8. Authentication
 
 Agents **MAY** require authentication, declared in the descriptor's `auth` field.
-Supported schemes in 0.x: `none`, `bearer`, `apiKey`, `oauth2`. Transport security
-(TLS) is **REQUIRED** for any non-`none` scheme.
+Transport security (TLS) is **REQUIRED** for any non-`none` scheme. Credentials
+**MUST** be sent in HTTP headers, never in the JSON-RPC body.
+
+| Scheme | Mechanics |
+|--------|-----------|
+| `none` | No authentication. |
+| `bearer` | Caller sends `Authorization: Bearer <token>`. |
+| `apiKey` | Caller sends the key in the header named by `auth.name` (default `X-API-Key`). `auth.in` is `header` in 0.x. |
+| `oauth2` | `auth.metadataUrl` points to the OAuth 2.0 Authorization Server Metadata (RFC 8414); `auth.scopes` lists required scopes. The caller obtains a token out of band and sends it as a bearer token. |
+
+On missing or invalid credentials an agent **MUST** return `-32003 AuthRequired`.
 
 ---
 

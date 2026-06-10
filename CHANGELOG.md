@@ -8,6 +8,25 @@ project adheres to [Semantic Versioning](https://semver.org). See
 ## [Unreleased]
 
 ### Added
+- **Submission semantics**: `tasks/submit` always returns a Task; async by
+  default, may return a terminal state for fast work (`specification.md` §5.1).
+- **Idempotency**: optional `idempotencyKey` on `tasks/submit`; safe retries.
+- **Task retention**: descriptor `taskRetention`; defined `tasks/get` window and
+  polling guidance (`Retry-After`).
+- **Version negotiation**: `-32006 UnsupportedVersion` and client-side version
+  check against the descriptor.
+- **Incremental result streaming**: `message` event carrying result `delta`
+  chunks (streamed tokens).
+- **Auth profiles**: concrete `bearer` / `apiKey` (header) / `oauth2`
+  (`metadataUrl` + `scopes`) mechanics; `oauth2` requires `metadataUrl`.
+- New examples (message delta, idempotent submit, oauth2 auth) and validation
+  coverage incl. negative cases.
+
+### Fixed
+- Reserved error code `-32005` corrected to `InvalidState` (was mislabeled
+  `Canceled` in `error.json`), consistent with the transport binding.
+
+### Added (previously)
 - JSON-RPC 2.0 envelope schemas (`schemas/jsonrpc.json`): Request, Notification,
   Success/Error Response.
 - OpenRPC method catalog (`openrpc.json`) enumerating all agent methods.

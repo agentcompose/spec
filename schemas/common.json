@@ -56,11 +56,37 @@
     "AuthScheme": {
       "type": "object",
       "required": ["type"],
-      "additionalProperties": true,
+      "additionalProperties": false,
       "properties": {
         "type": { "type": "string", "enum": ["none", "bearer", "apiKey", "oauth2"] },
-        "description": { "type": "string" }
-      }
+        "description": { "type": "string" },
+        "name": {
+          "type": "string",
+          "description": "For apiKey: the HTTP header carrying the key. Default: 'X-API-Key'."
+        },
+        "in": {
+          "type": "string",
+          "enum": ["header"],
+          "default": "header",
+          "description": "For apiKey: where the credential is sent. Only 'header' is supported in 0.x."
+        },
+        "metadataUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "For oauth2: the OAuth 2.0 Authorization Server Metadata URL (RFC 8414)."
+        },
+        "scopes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "For oauth2: scopes the caller must request."
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "const": "oauth2" } }, "required": ["type"] },
+          "then": { "required": ["metadataUrl"] }
+        }
+      ]
     },
     "Extensions": {
       "type": "object",

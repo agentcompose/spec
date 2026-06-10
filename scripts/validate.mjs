@@ -41,10 +41,13 @@ const get = (id) => {
 const positives = {
   "agent-descriptor.example.json": B + "agent-descriptor.json",
   "task-submit.example.json": B + "task-submit.json",
+  "task-submit-idempotent.example.json": B + "task-submit.json",
   "task.example.json": B + "task.json",
   "task-provide-input.example.json": B + "task-provide-input.json",
   "event-progress.example.json": B + "event.json",
+  "event-message.example.json": B + "event.json",
   "event-status-input-required.example.json": B + "event.json",
+  "auth-oauth2.example.json": B + "common.json#/$defs/AuthScheme",
   "jsonrpc-submit-request.example.json": B + "jsonrpc.json#/$defs/Request",
   "jsonrpc-task-response.example.json": B + "jsonrpc.json#/$defs/Response",
   "jsonrpc-error-response.example.json": B + "jsonrpc.json#/$defs/Response"
@@ -73,7 +76,9 @@ const negatives = [
   { name: "invalid task state", id: B + "task.json",
     data: { id: "t", state: "bogus", createdAt: "2026-06-10T00:00:00Z", updatedAt: "2026-06-10T00:00:00Z" } },
   { name: "provideInput with empty input", id: B + "task-provide-input.json",
-    data: { id: "t", input: [] } }
+    data: { id: "t", input: [] } },
+  { name: "oauth2 auth without metadataUrl", id: B + "common.json#/$defs/AuthScheme",
+    data: { type: "oauth2" } }
 ];
 
 for (const { name, id, data } of negatives) {

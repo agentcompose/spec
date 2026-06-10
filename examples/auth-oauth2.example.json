@@ -1,0 +1,5 @@
+{
+  "type": "oauth2",
+  "metadataUrl": "https://auth.example.com/.well-known/oauth-authorization-server",
+  "scopes": ["agentcompose.tasks"]
+}

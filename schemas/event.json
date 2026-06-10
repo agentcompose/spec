@@ -8,7 +8,7 @@
   "properties": {
     "type": {
       "type": "string",
-      "enum": ["status", "progress", "artifact", "result", "error"]
+      "enum": ["status", "progress", "message", "artifact", "result", "error"]
     },
     "taskId": { "type": "string" }
   },
@@ -34,6 +34,17 @@
         "percent": { "type": "number", "minimum": 0, "maximum": 100 }
       },
       "required": ["type", "taskId"],
+      "additionalProperties": false
+    },
+    {
+      "title": "MessageEvent",
+      "description": "An incremental chunk of the eventual result content (e.g. streamed tokens). Concatenating all message deltas for a task SHOULD reconstruct the streamed portion of the result.",
+      "properties": {
+        "type": { "const": "message" },
+        "taskId": { "type": "string" },
+        "delta": { "$ref": "https://agentcompose.dev/schemas/common.json#/$defs/Part" }
+      },
+      "required": ["type", "taskId", "delta"],
       "additionalProperties": false
     },
     {
