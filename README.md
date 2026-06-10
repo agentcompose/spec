@@ -1,9 +1,15 @@
 # AgentCompose Specification
 
+[![npm](https://img.shields.io/npm/v/@agentcompose/spec.svg)](https://www.npmjs.com/package/@agentcompose/spec)
+[![license](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
+
 > The normative contract that every AgentCompose-compliant agent and orchestrator
 > must follow. Language-neutral, schema-first, transport-bound.
 
-**Status:** `Draft` · **Spec version:** `0.1.0` · **License:** Apache-2.0
+**Spec version:** `0.1.0` · **Stability:** early (`0.x`) · **License:** Apache-2.0
+
+Published as [`@agentcompose/spec`](https://www.npmjs.com/package/@agentcompose/spec)
+(the JSON Schemas + prose) — `npm install @agentcompose/spec`.
 
 ---
 
@@ -30,16 +36,16 @@ It contains:
 | [`guides/`](./guides) | **Non-normative** guidance (e.g. [authoring agents](./guides/authoring-agents.md)) |
 | [`VERSIONING.md`](./VERSIONING.md) | Compatibility & evolution policy |
 
-This repo contains **no runtime and no SDK**. Those live in separate repos
-(`sdk-typescript`, `sdk-python`, `agentcompose` runtime) and are **generated from**
-or **validated against** the schemas here.
+This repo contains **no runtime and no SDK**. Those live in separate repos —
+[`sdk-typescript`](https://github.com/agentcompose/sdk-typescript) (the SDK) and
+[`engine`](https://github.com/agentcompose/engine) (the orchestration runtime) —
+and are **generated from** or **validated against** the schemas here.
 
 ```mermaid
 graph TB
     SCHEMAS[schemas/ — JSON Schema<br/>source of truth] --> SPEC[spec/ — normative prose]
     SCHEMAS -. generates types .-> TS[sdk-typescript]
-    SCHEMAS -. generates types .-> PY[sdk-python]
-    SCHEMAS -. validates .-> RT[agentcompose runtime]
+    SCHEMAS -. validates .-> RT[engine runtime]
 ```
 
 ## Core concepts (at a glance)
@@ -87,7 +93,7 @@ Backward-incompatible changes bump the major version. See
 
 ## Status & stability
 
-This is an **early draft (0.x)**. The shape is intended to be durable, but
+Published at **`0.1.0`** (early `0.x`). The shape is intended to be durable, but
 breaking changes may still occur before `1.0.0`. Feedback and proposals welcome
 via issues and RFC-style PRs against `spec/`.
 
