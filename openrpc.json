@@ -1,0 +1,56 @@
+{
+  "openrpc": "1.3.2",
+  "info": {
+    "title": "AgentCompose Agent API",
+    "version": "0.1.0",
+    "description": "JSON-RPC 2.0 methods every AgentCompose-compliant agent exposes. See spec/specification.md and spec/transport.md for normative detail.",
+    "license": { "name": "Apache-2.0", "url": "https://www.apache.org/licenses/LICENSE-2.0" }
+  },
+  "methods": [
+    {
+      "name": "tasks/submit",
+      "summary": "Submit a goal and create a new task.",
+      "params": [
+        { "name": "params", "required": true, "schema": { "$ref": "https://agentcompose.dev/schemas/task-submit.json" } }
+      ],
+      "result": { "name": "task", "schema": { "$ref": "https://agentcompose.dev/schemas/task.json" } }
+    },
+    {
+      "name": "tasks/get",
+      "summary": "Fetch the current state of a task.",
+      "params": [
+        { "name": "params", "required": true, "schema": { "$ref": "https://agentcompose.dev/schemas/task-ref.json" } }
+      ],
+      "result": { "name": "task", "schema": { "$ref": "https://agentcompose.dev/schemas/task.json" } }
+    },
+    {
+      "name": "tasks/cancel",
+      "summary": "Request graceful cancellation of a task.",
+      "params": [
+        { "name": "params", "required": true, "schema": { "$ref": "https://agentcompose.dev/schemas/task-ref.json" } }
+      ],
+      "result": { "name": "task", "schema": { "$ref": "https://agentcompose.dev/schemas/task.json" } }
+    },
+    {
+      "name": "tasks/provideInput",
+      "summary": "Supply requested input to a task in the input-required state, resuming it.",
+      "params": [
+        { "name": "params", "required": true, "schema": { "$ref": "https://agentcompose.dev/schemas/task-provide-input.json" } }
+      ],
+      "result": { "name": "task", "schema": { "$ref": "https://agentcompose.dev/schemas/task.json" } }
+    },
+    {
+      "name": "tasks/subscribe",
+      "summary": "Subscribe to a task's event stream. The HTTP response is text/event-stream (SSE); the JSON-RPC result is the current Task snapshot, followed by streamed event notifications. See spec/transport.md.",
+      "params": [
+        { "name": "params", "required": true, "schema": { "$ref": "https://agentcompose.dev/schemas/task-ref.json" } }
+      ],
+      "result": { "name": "task", "schema": { "$ref": "https://agentcompose.dev/schemas/task.json" } }
+    }
+  ],
+  "components": {
+    "schemas": {
+      "TaskEvent": { "$ref": "https://agentcompose.dev/schemas/event.json" }
+    }
+  }
+}

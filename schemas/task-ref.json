@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentcompose.dev/schemas/task-ref.json",
+  "title": "Task Reference",
+  "description": "Parameters for methods that operate on an existing task: tasks/get, tasks/cancel, tasks/subscribe.",
+  "type": "object",
+  "required": ["id"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "description": "The task identifier." }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentcompose.dev/schemas/task-provide-input.json",
+  "title": "Task Provide Input Params",
+  "description": "Parameters for tasks/provideInput: supplies the input an agent requested while in the input-required state, resuming the task.",
+  "type": "object",
+  "required": ["id", "input"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "description": "The task identifier (MUST be in the input-required state)." },
+    "input": {
+      "type": "array",
+      "minItems": 1,
+      "description": "The requested input, expressed as one or more parts.",
+      "items": { "$ref": "https://agentcompose.dev/schemas/common.json#/$defs/Part" }
+    },
+    "extensions": { "$ref": "https://agentcompose.dev/schemas/common.json#/$defs/Extensions" }
+  }
+}

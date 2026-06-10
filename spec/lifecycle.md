@@ -24,7 +24,7 @@ stateDiagram-v2
     working --> completed: success
     working --> failed: error
     working --> canceled: tasks/cancel
-    input-required --> working: input provided
+    input-required --> working: tasks/provideInput
     input-required --> canceled: tasks/cancel
     completed --> [*]
     failed --> [*]
@@ -46,6 +46,10 @@ stateDiagram-v2
 7. `tasks/cancel` is a *request*. An agent **SHOULD** transition to `canceled`
    promptly but **MAY** complete in-flight work first if cancellation is not
    safely possible; in that case it transitions to `completed`/`failed` instead.
+8. The `input-required` → `working` transition occurs **only** via
+   `tasks/provideInput` (see [`transport.md`](./transport.md)). When entering
+   `input-required`, the agent **SHOULD** describe the needed input in the
+   `status` event's `message` field.
 
 ## Events emitted per state
 

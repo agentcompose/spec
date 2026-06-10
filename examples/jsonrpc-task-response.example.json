@@ -1,0 +1,11 @@
+{
+  "jsonrpc": "2.0",
+  "id": "1",
+  "result": {
+    "id": "task_01HZX9K3M7Q",
+    "state": "working",
+    "createdAt": "2026-06-10T07:00:00Z",
+    "updatedAt": "2026-06-10T07:00:01Z",
+    "artifacts": []
+  }
+}

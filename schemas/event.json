@@ -19,6 +19,7 @@
         "type": { "const": "status" },
         "taskId": { "type": "string" },
         "state": { "$ref": "https://agentcompose.dev/schemas/common.json#/$defs/TaskState" },
+        "message": { "type": "string", "description": "Optional human-readable detail. When state is input-required, SHOULD describe what input is needed." },
         "timestamp": { "type": "string", "format": "date-time" }
       },
       "required": ["type", "taskId", "state"],

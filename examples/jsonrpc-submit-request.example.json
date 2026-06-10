@@ -1,0 +1,11 @@
+{
+  "jsonrpc": "2.0",
+  "id": "1",
+  "method": "tasks/submit",
+  "params": {
+    "goal": [
+      { "kind": "text", "text": "Research the latest AI agent interoperability standards and summarize the top three with sources." }
+    ],
+    "capabilityId": "research"
+  }
+}

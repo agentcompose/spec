@@ -19,6 +19,7 @@ It contains:
 |------|---------|
 | [`spec/`](./spec) | The **normative specification** (prose, RFC-style) |
 | [`schemas/`](./schemas) | **JSON Schemas** — the machine-readable source of truth |
+| [`openrpc.json`](./openrpc.json) | **OpenRPC** method catalog (machine-readable API) |
 | [`examples/`](./examples) | Valid example payloads, used in conformance tests |
 | [`VERSIONING.md`](./VERSIONING.md) | Compatibility & evolution policy |
 
@@ -54,10 +55,12 @@ Every compliant agent exposes these capabilities over the transport binding:
 | Discovery | _well-known descriptor_ | Advertise metadata + capabilities |
 | Task submission | `tasks/submit` | Accept a goal, begin work |
 | Task query | `tasks/get` | Fetch current task state |
+| Provide input | `tasks/provideInput` | Resume a task waiting on input |
 | Streaming | `tasks/subscribe` | Stream progress, artifacts, result |
 | Cancellation | `tasks/cancel` | Request graceful cancellation |
 
-See [`spec/specification.md`](./spec/specification.md) for the normative detail.
+See [`spec/specification.md`](./spec/specification.md) and
+[`spec/transport.md`](./spec/transport.md) for the normative detail.
 
 ## Versioning
 

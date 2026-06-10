@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentcompose.dev/schemas/jsonrpc.json",
+  "title": "JSON-RPC 2.0 Envelopes",
+  "description": "Generic JSON-RPC 2.0 message envelopes used by the AgentCompose transport binding. Batch requests are NOT supported in 0.x.",
+  "$defs": {
+    "Id": {
+      "description": "JSON-RPC request identifier.",
+      "type": ["string", "number"]
+    },
+    "Request": {
+      "type": "object",
+      "required": ["jsonrpc", "id", "method"],
+      "additionalProperties": false,
+      "properties": {
+        "jsonrpc": { "const": "2.0" },
+        "id": { "$ref": "#/$defs/Id" },
+        "method": { "type": "string" },
+        "params": { "type": "object" }
+      }
+    },
+    "Notification": {
+      "description": "A JSON-RPC notification (no id). Used to deliver streamed task events over SSE.",
+      "type": "object",
+      "required": ["jsonrpc", "method"],
+      "additionalProperties": false,
+      "properties": {
+        "jsonrpc": { "const": "2.0" },
+        "method": { "type": "string" },
+        "params": { "type": "object" }
+      }
+    },
+    "SuccessResponse": {
+      "type": "object",
+      "required": ["jsonrpc", "id", "result"],
+      "additionalProperties": false,
+      "properties": {
+        "jsonrpc": { "const": "2.0" },
+        "id": { "$ref": "#/$defs/Id" },
+        "result": {}
+      }
+    },
+    "ErrorResponse": {
+      "type": "object",
+      "required": ["jsonrpc", "id", "error"],
+      "additionalProperties": false,
+      "properties": {
+        "jsonrpc": { "const": "2.0" },
+        "id": { "oneOf": [{ "$ref": "#/$defs/Id" }, { "type": "null" }] },
+        "error": { "$ref": "https://agentcompose.dev/schemas/error.json" }
+      }
+    },
+    "Response": {
+      "oneOf": [
+        { "$ref": "#/$defs/SuccessResponse" },
+        { "$ref": "#/$defs/ErrorResponse" }
+      ]
+    }
+  }
+}

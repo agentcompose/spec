@@ -70,7 +70,7 @@ GET /.well-known/agentcompose.json
 ```
 
 The response **MUST** validate against
-[`schemas/agent-descriptor.schema.json`](../schemas/agent-descriptor.schema.json).
+[`schemas/agent-descriptor.json`](../schemas/agent-descriptor.json).
 
 ### 3.2 Required fields
 
@@ -116,7 +116,7 @@ A **Task** is a unit of work submitted toward a goal.
 
 An orchestrator submits a task via the `tasks/submit` method. The request
 **MUST** include a goal expressed as one or more input parts and **MUST** validate
-against [`schemas/task-submit.schema.json`](../schemas/task-submit.schema.json).
+against [`schemas/task-submit.json`](../schemas/task-submit.json).
 
 A goal is a desired outcome, e.g.:
 
@@ -129,7 +129,7 @@ An orchestrator **MUST NOT** require the agent to follow a prescribed procedure.
 ### 5.2 Task object
 
 The agent responds with a **Task** object that validates against
-[`schemas/task.schema.json`](../schemas/task.schema.json):
+[`schemas/task.json`](../schemas/task.json):
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -165,31 +165,49 @@ emit incremental progress and artifacts while in `working`.
 
 ## 7. Transport binding
 
+The transport binding is **JSON-RPC 2.0** over **HTTP(S)** with **Server-Sent
+Events** for streaming. The method catalog is published as an OpenRPC document
+([`openrpc.json`](../openrpc.json)); the full binding — request/response
+envelopes, SSE frame format, ordering, reconnection, and heartbeats — is normative
+in [`spec/transport.md`](./transport.md).
+
 ### 7.1 Protocol
 
-The normative transport is **JSON-RPC 2.0** over **HTTP(S)**. Requests are
-`POST`ed to the agent's `endpoint`.
+Requests are single JSON-RPC 2.0 Request objects `POST`ed to the agent's
+`endpoint`. Batch requests are **NOT** supported in 0.x. Envelopes validate
+against [`schemas/jsonrpc.json`](../schemas/jsonrpc.json).
 
 ### 7.2 Methods
 
 | Method | Params | Result |
 |--------|--------|--------|
-| `tasks/submit` | goal + metadata | Task |
-| `tasks/get` | `{ id }` | Task |
-| `tasks/cancel` | `{ id }` | Task |
-| `tasks/subscribe` | `{ id }` | event stream (SSE) |
+| `tasks/submit` | [`task-submit.json`](../schemas/task-submit.json) | Task |
+| `tasks/get` | [`task-ref.json`](../schemas/task-ref.json) | Task |
+| `tasks/cancel` | [`task-ref.json`](../schemas/task-ref.json) | Task |
+| `tasks/provideInput` | [`task-provide-input.json`](../schemas/task-provide-input.json) | Task |
+| `tasks/subscribe` | [`task-ref.json`](../schemas/task-ref.json) | Task snapshot + SSE event stream |
 
-### 7.3 Streaming
+### 7.3 Resuming an input-required task
+
+When a task enters `input-required`, the agent **SHOULD** describe the needed
+input via the `message` field of the `status` event. The caller supplies it with
+`tasks/provideInput`, which transitions the task back to `working`. Calling
+`tasks/provideInput` on a task that is not in `input-required` **MUST** fail with
+`-32005` (InvalidState).
+
+### 7.4 Streaming
 
 `tasks/subscribe` **MUST** be served as **Server-Sent Events**. Each event is a
 JSON-RPC notification carrying one of: `status`, `progress`, `artifact`, `result`,
-`error`. Streams **MUST** terminate after a terminal state.
+`error`. Streams **MUST** terminate after a terminal state. See
+[`spec/transport.md`](./transport.md) for the frame format.
 
-### 7.4 Errors
+### 7.5 Errors
 
 Errors **MUST** use JSON-RPC error objects. AgentCompose reserves the range
 `-32000`..`-32099` for protocol-level errors (defined in
-[`schemas/error.schema.json`](../schemas/error.schema.json)).
+[`schemas/error.json`](../schemas/error.json) and tabulated in
+[`spec/transport.md`](./transport.md)).
 
 ---
 
@@ -212,13 +230,34 @@ See [`VERSIONING.md`](../VERSIONING.md).
 
 ---
 
-## 10. Conformance
+## 10. Security considerations
+
+- **Transport security.** Any non-`none` auth scheme **MUST** operate over TLS.
+  Credentials **MUST** be carried in the `Authorization` header, never in the
+  JSON-RPC body.
+- **SSRF.** Agents (and orchestrators) that dereference a `FilePart.uri` **MUST**
+  validate the URL scheme and host and **MUST** refuse internal/link-local
+  addresses unless explicitly configured. Untrusted `uri` values are a
+  server-side request forgery vector.
+- **Untrusted content.** Goals, results, and artifacts may contain attacker-
+  controlled data. Consumers **MUST NOT** execute artifact content and **SHOULD**
+  treat all parts as untrusted input (prompt-injection aware).
+- **Resource limits.** Agents **SHOULD** enforce size limits on inline `bytes`
+  parts and apply rate limiting (`-32004`).
+- **Authorization.** A valid task `id` **MUST NOT** be sufficient to access a
+  task across tenants; agents **MUST** scope tasks to the authenticated caller.
+
+---
+
+## 11. Conformance
 
 An implementation is **conformant** if it:
 
 1. Serves a valid Agent Descriptor.
-2. Implements all required transport methods.
+2. Implements all required transport methods, including `tasks/provideInput`
+   whenever it can emit the `input-required` state.
 3. Produces payloads that validate against the published schemas.
-4. Honors the task lifecycle transition rules.
+4. Honors the task lifecycle transition rules and the transport binding
+   ([`spec/transport.md`](./transport.md)).
 
 Conformance test vectors live in [`examples/`](../examples).
