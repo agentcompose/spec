@@ -92,6 +92,19 @@ for (const { name, id, data } of negatives) {
   }
 }
 
+// 4. NDJSON stdio session: every line MUST be a valid JSON-RPC Message.
+const msg = get(B + "jsonrpc.json#/$defs/Message");
+if (msg) {
+  const lines = readFileSync(join(examplesDir, "stdio-session.jsonl"), "utf8")
+    .split("\n").filter((l) => l.trim().length > 0);
+  let bad = 0;
+  for (const [i, line] of lines.entries()) {
+    if (!msg(JSON.parse(line))) { console.error(`✗ stdio-session line ${i + 1}`, msg.errors); bad++; }
+  }
+  if (bad === 0) console.log(`✓ stdio-session.jsonl (${lines.length} messages)`);
+  failed += bad;
+}
+
 if (failed > 0) {
   console.error(`\n${failed} check(s) failed.`);
   process.exit(1);

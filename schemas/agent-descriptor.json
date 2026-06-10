@@ -4,7 +4,7 @@
   "title": "Agent Descriptor",
   "description": "Public metadata an agent advertises for discovery and orchestration.",
   "type": "object",
-  "required": ["agentcomposeVersion", "id", "name", "version", "capabilities", "endpoint"],
+  "required": ["agentcomposeVersion", "id", "name", "version", "capabilities"],
   "additionalProperties": false,
   "properties": {
     "agentcomposeVersion": {
@@ -40,7 +40,7 @@
     "endpoint": {
       "type": "string",
       "format": "uri",
-      "description": "Base URL for the JSON-RPC transport."
+      "description": "Base URL for the HTTP transport binding. REQUIRED for the HTTP binding; omitted for stdio-only agents."
     },
     "taskRetention": {
       "type": "integer",

@@ -52,15 +52,17 @@ Every compliant agent exposes these capabilities over the transport binding:
 
 | Surface | Method | Description |
 |---------|--------|-------------|
-| Discovery | _well-known descriptor_ | Advertise metadata + capabilities |
+| Discovery | `agent/describe` / well-known URL | Advertise metadata + capabilities |
 | Task submission | `tasks/submit` | Accept a goal, begin work |
 | Task query | `tasks/get` | Fetch current task state |
 | Provide input | `tasks/provideInput` | Resume a task waiting on input |
-| Streaming | `tasks/subscribe` | Stream progress, artifacts, result |
+| Streaming | `tasks/subscribe` / pushed events | Stream progress, artifacts, result |
 | Cancellation | `tasks/cancel` | Request graceful cancellation |
 
-See [`spec/specification.md`](./spec/specification.md) and
-[`spec/transport.md`](./spec/transport.md) for the normative detail.
+The contract is **transport-neutral**, with two bindings:
+[HTTP](./spec/transport.md) (network, SSE) and
+[stdio](./spec/transport-stdio.md) (local subprocess, NDJSON). See
+[`spec/specification.md`](./spec/specification.md) for normative detail.
 
 ## Versioning
 

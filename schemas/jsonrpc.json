@@ -55,6 +55,15 @@
         { "$ref": "#/$defs/SuccessResponse" },
         { "$ref": "#/$defs/ErrorResponse" }
       ]
+    },
+    "Message": {
+      "description": "Any single JSON-RPC message exchanged over a transport (used by line-delimited bindings such as stdio).",
+      "oneOf": [
+        { "$ref": "#/$defs/Request" },
+        { "$ref": "#/$defs/Notification" },
+        { "$ref": "#/$defs/SuccessResponse" },
+        { "$ref": "#/$defs/ErrorResponse" }
+      ]
     }
   }
 }

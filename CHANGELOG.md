@@ -8,6 +8,14 @@ project adheres to [Semantic Versioning](https://semver.org). See
 ## [Unreleased]
 
 ### Added
+- **stdio transport binding** (`spec/transport-stdio.md`): run an agent as a local
+  child process communicating via NDJSON over stdin/stdout. Enables local and
+  polyglot composition with no network or `endpoint` URL.
+- **Transport-neutral core**: §7 reframed as a neutral core with pluggable bindings
+  (HTTP + stdio) carrying identical JSON-RPC messages.
+- **`agent/describe`** method: discovery without a well-known URL (primary for
+  stdio; optional under HTTP).
+- `Message` union in `schemas/jsonrpc.json`; per-line NDJSON validation.
 - **Submission semantics**: `tasks/submit` always returns a Task; async by
   default, may return a terminal state for fast work (`specification.md` §5.1).
 - **Idempotency**: optional `idempotencyKey` on `tasks/submit`; safe retries.
@@ -21,6 +29,10 @@ project adheres to [Semantic Versioning](https://semver.org). See
   (`metadataUrl` + `scopes`) mechanics; `oauth2` requires `metadataUrl`.
 - New examples (message delta, idempotent submit, oauth2 auth) and validation
   coverage incl. negative cases.
+
+### Changed
+- `agent-descriptor.endpoint` is now **optional** (required only for the HTTP
+  binding; omitted for stdio-only agents).
 
 ### Fixed
 - Reserved error code `-32005` corrected to `InvalidState` (was mislabeled

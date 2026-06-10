@@ -1,0 +1,8 @@
+{"jsonrpc":"2.0","id":"0","method":"agent/describe"}
+{"jsonrpc":"2.0","id":"0","result":{"agentcomposeVersion":"0.1.0","id":"dev.example.research","name":"Research Agent","version":"1.0.0","capabilities":[{"id":"research","description":"Research a topic and summarize with sources."}]}}
+{"jsonrpc":"2.0","id":"1","method":"tasks/submit","params":{"goal":[{"kind":"text","text":"Summarize AI agent interoperability standards."}]}}
+{"jsonrpc":"2.0","id":"1","result":{"id":"task_1","state":"working","createdAt":"2026-06-10T08:00:00Z","updatedAt":"2026-06-10T08:00:00Z","artifacts":[]}}
+{"jsonrpc":"2.0","method":"task/event","params":{"type":"status","taskId":"task_1","state":"working"}}
+{"jsonrpc":"2.0","method":"task/event","params":{"type":"message","taskId":"task_1","delta":{"kind":"text","text":"The top three are MCP, A2A, and AgentCompose."}}}
+{"jsonrpc":"2.0","method":"task/event","params":{"type":"result","taskId":"task_1","result":{"parts":[{"kind":"text","text":"The top three are MCP, A2A, and AgentCompose."}]}}}
+{"jsonrpc":"2.0","method":"task/event","params":{"type":"status","taskId":"task_1","state":"completed"}}

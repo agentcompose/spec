@@ -8,6 +8,12 @@
   },
   "methods": [
     {
+      "name": "agent/describe",
+      "summary": "Return this agent's descriptor (metadata + capabilities). Primary discovery mechanism for the stdio binding; OPTIONAL under HTTP (well-known URL is primary).",
+      "params": [],
+      "result": { "name": "descriptor", "schema": { "$ref": "https://agentcompose.dev/schemas/agent-descriptor.json" } }
+    },
+    {
       "name": "tasks/submit",
       "summary": "Submit a goal and create a new task.",
       "params": [

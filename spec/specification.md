@@ -63,13 +63,13 @@ describing its identity and capabilities.
 
 ### 3.1 Discovery
 
-An agent **SHOULD** serve its descriptor at the well-known URI:
+An agent exposes its descriptor in a transport-appropriate way:
 
-```
-GET /.well-known/agentcompose.json
-```
+- **HTTP binding:** served at the well-known URI `GET /.well-known/agentcompose.json`.
+- **stdio binding:** returned from the `agent/describe` method (there is no URL).
 
-The response **MUST** validate against
+Agents **MAY** support the `agent/describe` method under any binding. The response
+**MUST** validate against
 [`schemas/agent-descriptor.json`](../schemas/agent-descriptor.json).
 
 ### 3.2 Required fields
@@ -81,7 +81,7 @@ The response **MUST** validate against
 | `name` | string | Human-readable name. |
 | `version` | string | The agent's own version (SemVer). |
 | `capabilities` | Capability[] | One or more capabilities (see §4). |
-| `endpoint` | string (URI) | Base URL for the JSON-RPC transport. |
+| `endpoint` | string (URI) | Base URL for the HTTP binding. REQUIRED for HTTP; omitted for stdio-only agents. |
 
 ### 3.3 Optional fields
 
@@ -187,31 +187,41 @@ a `Retry-After` header hint on non-terminal responses. Streaming
 
 ---
 
-## 7. Transport binding
+## 7. Transport bindings
 
-The transport binding is **JSON-RPC 2.0** over **HTTP(S)** with **Server-Sent
-Events** for streaming. The method catalog is published as an OpenRPC document
-([`openrpc.json`](../openrpc.json)); the full binding — request/response
-envelopes, SSE frame format, ordering, reconnection, and heartbeats — is normative
-in [`spec/transport.md`](./transport.md).
+The contract is defined over a **transport-neutral core**: the methods
+([`openrpc.json`](../openrpc.json)), the JSON-RPC message shapes
+([`schemas/jsonrpc.json`](../schemas/jsonrpc.json)), and the task lifecycle. A
+**binding** specifies how those messages are framed and delivered over a concrete
+channel. Two bindings are defined; both carry the **same** JSON-RPC messages and
+schemas:
 
-### 7.1 Protocol
+| Binding | Channel | Discovery | Streaming | Spec |
+|---------|---------|-----------|-----------|------|
+| **HTTP** | HTTP(S) POST + SSE | well-known URL | SSE stream | [`transport.md`](./transport.md) |
+| **stdio** | child process stdin/stdout (NDJSON) | `agent/describe` | pushed notifications | [`transport-stdio.md`](./transport-stdio.md) |
 
-Requests are single JSON-RPC 2.0 Request objects `POST`ed to the agent's
-`endpoint`. Batch requests are **NOT** supported in 0.x. Envelopes validate
-against [`schemas/jsonrpc.json`](../schemas/jsonrpc.json).
+An agent **MUST** implement at least one binding and **MAY** implement both.
 
-### 7.2 Methods
+### 7.1 Methods
+
+The method catalog is identical across bindings:
 
 | Method | Params | Result |
 |--------|--------|--------|
+| `agent/describe` | _(none)_ | Agent Descriptor |
 | `tasks/submit` | [`task-submit.json`](../schemas/task-submit.json) | Task |
 | `tasks/get` | [`task-ref.json`](../schemas/task-ref.json) | Task |
 | `tasks/cancel` | [`task-ref.json`](../schemas/task-ref.json) | Task |
 | `tasks/provideInput` | [`task-provide-input.json`](../schemas/task-provide-input.json) | Task |
-| `tasks/subscribe` | [`task-ref.json`](../schemas/task-ref.json) | Task snapshot + SSE event stream |
+| `tasks/subscribe` | [`task-ref.json`](../schemas/task-ref.json) | Task snapshot + event stream (HTTP binding) |
 
-### 7.3 Resuming an input-required task
+Task events (`status`, `progress`, `message`, `artifact`, `result`, `error`) are
+delivered as JSON-RPC notifications with method `task/event` and params validating
+against [`schemas/event.json`](../schemas/event.json). How they are *framed*
+differs per binding (SSE vs. raw notifications); the payload is identical.
+
+### 7.2 Resuming an input-required task
 
 When a task enters `input-required`, the agent **SHOULD** describe the needed
 input via the `message` field of the `status` event. The caller supplies it with
@@ -219,24 +229,27 @@ input via the `message` field of the `status` event. The caller supplies it with
 `tasks/provideInput` on a task that is not in `input-required` **MUST** fail with
 `-32005` (InvalidState).
 
-### 7.4 Streaming
+### 7.3 Streaming events
 
-`tasks/subscribe` **MUST** be served as **Server-Sent Events**. Each event is a
-JSON-RPC notification carrying one of: `status`, `progress`, `message`,
-`artifact`, `result`, `error`. A `message` event carries an incremental `delta`
-of the eventual result content (e.g. streamed tokens); concatenating a task's
-`message` deltas **SHOULD** reconstruct the streamed portion of the result.
-Streams **MUST** terminate after a terminal state. See
-[`spec/transport.md`](./transport.md) for the frame format.
+Every binding delivers task events as `task/event` notifications. A `message`
+event carries an incremental `delta` of the eventual result content (e.g. streamed
+tokens); concatenating a task's `message` deltas **SHOULD** reconstruct the
+streamed portion of the result. Event delivery **MUST** stop after a terminal
+state.
 
-### 7.5 Version negotiation
+- Under the **HTTP binding**, a client opens a stream with `tasks/subscribe` and
+  receives SSE frames; see [`transport.md`](./transport.md).
+- Under the **stdio binding**, the agent pushes `task/event` notifications on
+  stdout for active tasks; see [`transport-stdio.md`](./transport-stdio.md).
+
+### 7.4 Version negotiation
 
 A client **SHOULD** read the descriptor's `agentcomposeVersion` before calling an
 agent. If an agent receives a request it cannot serve under a compatible major
 version, it **MUST** respond with `-32006 UnsupportedVersion`. Compatibility
 follows [`VERSIONING.md`](../VERSIONING.md).
 
-### 7.6 Errors
+### 7.5 Errors
 
 Errors **MUST** use JSON-RPC error objects. AgentCompose reserves the range
 `-32000`..`-32099` for protocol-level errors (defined in
