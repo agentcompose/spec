@@ -27,6 +27,7 @@ It contains:
 | [`schemas/`](./schemas) | **JSON Schemas** — the machine-readable source of truth |
 | [`openrpc.json`](./openrpc.json) | **OpenRPC** method catalog (machine-readable API) |
 | [`examples/`](./examples) | Valid example payloads, used in conformance tests |
+| [`guides/`](./guides) | **Non-normative** guidance (e.g. [authoring agents](./guides/authoring-agents.md)) |
 | [`VERSIONING.md`](./VERSIONING.md) | Compatibility & evolution policy |
 
 This repo contains **no runtime and no SDK**. Those live in separate repos
