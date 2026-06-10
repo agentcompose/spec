@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentcompose.dev/schemas/result.json",
+  "title": "Result",
+  "description": "The successful outcome of a completed task.",
+  "type": "object",
+  "required": ["parts"],
+  "additionalProperties": false,
+  "properties": {
+    "parts": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "https://agentcompose.dev/schemas/common.json#/$defs/Part" }
+    },
+    "extensions": { "$ref": "https://agentcompose.dev/schemas/common.json#/$defs/Extensions" }
+  }
+}

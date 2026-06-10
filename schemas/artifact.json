@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentcompose.dev/schemas/artifact.json",
+  "title": "Artifact",
+  "description": "A tangible output produced during or after a task.",
+  "type": "object",
+  "required": ["id", "parts"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "description": "Unique artifact identifier within the task." },
+    "name": { "type": "string" },
+    "description": { "type": "string" },
+    "parts": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "https://agentcompose.dev/schemas/common.json#/$defs/Part" }
+    },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "extensions": { "$ref": "https://agentcompose.dev/schemas/common.json#/$defs/Extensions" }
+  }
+}

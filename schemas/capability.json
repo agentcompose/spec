@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentcompose.dev/schemas/capability.json",
+  "title": "Capability",
+  "description": "Declares a class of problems an agent can solve.",
+  "type": "object",
+  "required": ["id", "description"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "description": "Stable capability identifier, unique within the agent."
+    },
+    "description": {
+      "type": "string",
+      "description": "Natural-language description of what this capability solves."
+    },
+    "inputModes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": ["text/plain"],
+      "description": "Accepted input content types."
+    },
+    "outputModes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": ["text/plain"],
+      "description": "Produced output content types."
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Optional discovery tags."
+    },
+    "extensions": { "$ref": "https://agentcompose.dev/schemas/common.json#/$defs/Extensions" }
+  }
+}

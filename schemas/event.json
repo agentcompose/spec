@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentcompose.dev/schemas/event.json",
+  "title": "Task Event",
+  "description": "An event streamed over tasks/subscribe (delivered as an SSE-wrapped JSON-RPC notification).",
+  "type": "object",
+  "required": ["type", "taskId"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": ["status", "progress", "artifact", "result", "error"]
+    },
+    "taskId": { "type": "string" }
+  },
+  "oneOf": [
+    {
+      "title": "StatusEvent",
+      "properties": {
+        "type": { "const": "status" },
+        "taskId": { "type": "string" },
+        "state": { "$ref": "https://agentcompose.dev/schemas/common.json#/$defs/TaskState" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["type", "taskId", "state"],
+      "additionalProperties": false
+    },
+    {
+      "title": "ProgressEvent",
+      "properties": {
+        "type": { "const": "progress" },
+        "taskId": { "type": "string" },
+        "message": { "type": "string" },
+        "percent": { "type": "number", "minimum": 0, "maximum": 100 }
+      },
+      "required": ["type", "taskId"],
+      "additionalProperties": false
+    },
+    {
+      "title": "ArtifactEvent",
+      "properties": {
+        "type": { "const": "artifact" },
+        "taskId": { "type": "string" },
+        "artifact": { "$ref": "https://agentcompose.dev/schemas/artifact.json" }
+      },
+      "required": ["type", "taskId", "artifact"],
+      "additionalProperties": false
+    },
+    {
+      "title": "ResultEvent",
+      "properties": {
+        "type": { "const": "result" },
+        "taskId": { "type": "string" },
+        "result": { "$ref": "https://agentcompose.dev/schemas/result.json" }
+      },
+      "required": ["type", "taskId", "result"],
+      "additionalProperties": false
+    },
+    {
+      "title": "ErrorEvent",
+      "properties": {
+        "type": { "const": "error" },
+        "taskId": { "type": "string" },
+        "error": { "$ref": "https://agentcompose.dev/schemas/error.json" }
+      },
+      "required": ["type", "taskId", "error"],
+      "additionalProperties": false
+    }
+  ]
+}

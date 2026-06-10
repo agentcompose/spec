@@ -1,0 +1,7 @@
+{
+  "goal": [
+    { "kind": "text", "text": "Research the latest AI agent interoperability standards and summarize the top three with sources." }
+  ],
+  "capabilityId": "research",
+  "metadata": { "traceId": "5f0c8b1e-2a3d-4f6a-9b7c-1d2e3f4a5b6c", "priority": "normal" }
+}

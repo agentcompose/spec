@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentcompose.dev/schemas/task.json",
+  "title": "Task",
+  "description": "A unit of work submitted to an agent toward a goal.",
+  "type": "object",
+  "required": ["id", "state", "createdAt", "updatedAt"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "description": "Agent-assigned unique task identifier." },
+    "state": { "$ref": "https://agentcompose.dev/schemas/common.json#/$defs/TaskState" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "result": { "$ref": "https://agentcompose.dev/schemas/result.json" },
+    "error": { "$ref": "https://agentcompose.dev/schemas/error.json" },
+    "artifacts": {
+      "type": "array",
+      "items": { "$ref": "https://agentcompose.dev/schemas/artifact.json" },
+      "default": []
+    },
+    "extensions": { "$ref": "https://agentcompose.dev/schemas/common.json#/$defs/Extensions" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "state": { "const": "completed" } } },
+      "then": { "required": ["result"] }
+    },
+    {
+      "if": { "properties": { "state": { "const": "failed" } } },
+      "then": { "required": ["error"] }
+    }
+  ]
+}

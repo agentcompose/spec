@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentcompose.dev/schemas/agent-descriptor.json",
+  "title": "Agent Descriptor",
+  "description": "Public metadata an agent advertises for discovery and orchestration.",
+  "type": "object",
+  "required": ["agentcomposeVersion", "id", "name", "version", "capabilities", "endpoint"],
+  "additionalProperties": false,
+  "properties": {
+    "agentcomposeVersion": {
+      "type": "string",
+      "description": "The AgentCompose contract version implemented (SemVer).",
+      "pattern": "^\\d+\\.\\d+\\.\\d+"
+    },
+    "id": {
+      "type": "string",
+      "description": "Stable, globally unique identifier. Reverse-DNS RECOMMENDED.",
+      "examples": ["dev.agentcompose.agents.research"]
+    },
+    "name": { "type": "string", "description": "Human-readable name." },
+    "version": {
+      "type": "string",
+      "description": "The agent's own version (SemVer).",
+      "pattern": "^\\d+\\.\\d+\\.\\d+"
+    },
+    "description": { "type": "string" },
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "url": { "type": "string", "format": "uri" }
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "https://agentcompose.dev/schemas/capability.json" }
+    },
+    "endpoint": {
+      "type": "string",
+      "format": "uri",
+      "description": "Base URL for the JSON-RPC transport."
+    },
+    "auth": { "$ref": "https://agentcompose.dev/schemas/common.json#/$defs/AuthScheme" },
+    "documentationUrl": { "type": "string", "format": "uri" },
+    "iconUrl": { "type": "string", "format": "uri" },
+    "extensions": { "$ref": "https://agentcompose.dev/schemas/common.json#/$defs/Extensions" }
+  }
+}

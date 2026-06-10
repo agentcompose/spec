@@ -1,0 +1,21 @@
+{
+  "id": "task_01HZX9K3M7Q",
+  "state": "completed",
+  "createdAt": "2026-06-10T07:00:00Z",
+  "updatedAt": "2026-06-10T07:00:42Z",
+  "result": {
+    "parts": [
+      { "kind": "text", "mediaType": "text/markdown", "text": "## Summary\n\n1. **MCP** — tool/resource access...\n2. **A2A** — agent-to-agent messaging...\n3. **AgentCompose** — orchestration & lifecycle..." }
+    ]
+  },
+  "artifacts": [
+    {
+      "id": "artifact_sources",
+      "name": "sources.json",
+      "parts": [
+        { "kind": "json", "json": { "sources": ["https://modelcontextprotocol.io", "https://a2a.example"] } }
+      ],
+      "createdAt": "2026-06-10T07:00:40Z"
+    }
+  ]
+}

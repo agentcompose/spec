@@ -1,0 +1,20 @@
+{
+  "agentcomposeVersion": "0.1.0",
+  "id": "dev.agentcompose.agents.research",
+  "name": "Research Agent",
+  "version": "1.0.0",
+  "description": "Researches a topic and returns a structured summary with sources.",
+  "provider": { "name": "AgentCompose", "url": "https://agentcompose.dev" },
+  "capabilities": [
+    {
+      "id": "research",
+      "description": "Given a goal, gather and synthesize information into a summary with citations.",
+      "inputModes": ["text/plain"],
+      "outputModes": ["text/markdown", "application/json"],
+      "tags": ["research", "web", "summarization"]
+    }
+  ],
+  "endpoint": "https://research.example.com/agentcompose",
+  "auth": { "type": "bearer", "description": "Bearer token issued by the provider." },
+  "documentationUrl": "https://research.example.com/docs"
+}

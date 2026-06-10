@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentcompose.dev/schemas/error.json",
+  "title": "Error",
+  "description": "A JSON-RPC-compatible error object. AgentCompose reserves codes -32000..-32099.",
+  "type": "object",
+  "required": ["code", "message"],
+  "additionalProperties": false,
+  "properties": {
+    "code": {
+      "type": "integer",
+      "description": "JSON-RPC error code. Protocol-level errors use -32000..-32099."
+    },
+    "message": { "type": "string" },
+    "data": { "description": "Optional structured error detail." }
+  },
+  "$comment": "Reserved AgentCompose codes: -32000 TaskNotFound, -32001 CapabilityNotSupported, -32002 InvalidGoal, -32003 AuthRequired, -32004 RateLimited, -32005 Canceled."
+}

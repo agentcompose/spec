@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentcompose.dev/schemas/common.json",
+  "title": "AgentCompose Common Definitions",
+  "description": "Shared definitions referenced by other AgentCompose schemas.",
+  "$defs": {
+    "TaskState": {
+      "type": "string",
+      "enum": ["submitted", "working", "input-required", "completed", "failed", "canceled"],
+      "description": "Lifecycle state of a Task."
+    },
+    "Part": {
+      "description": "A single piece of content exchanged with an agent.",
+      "oneOf": [
+        { "$ref": "#/$defs/TextPart" },
+        { "$ref": "#/$defs/JsonPart" },
+        { "$ref": "#/$defs/FilePart" }
+      ]
+    },
+    "TextPart": {
+      "type": "object",
+      "required": ["kind", "text"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "text" },
+        "text": { "type": "string" },
+        "mediaType": { "type": "string", "default": "text/plain" }
+      }
+    },
+    "JsonPart": {
+      "type": "object",
+      "required": ["kind", "json"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "json" },
+        "json": {},
+        "mediaType": { "type": "string", "default": "application/json" }
+      }
+    },
+    "FilePart": {
+      "type": "object",
+      "required": ["kind", "mediaType"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "file" },
+        "name": { "type": "string" },
+        "mediaType": { "type": "string" },
+        "uri": { "type": "string", "format": "uri", "description": "Location of the file content." },
+        "bytes": { "type": "string", "contentEncoding": "base64", "description": "Inline base64-encoded content." }
+      },
+      "anyOf": [
+        { "required": ["uri"] },
+        { "required": ["bytes"] }
+      ]
+    },
+    "AuthScheme": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": true,
+      "properties": {
+        "type": { "type": "string", "enum": ["none", "bearer", "apiKey", "oauth2"] },
+        "description": { "type": "string" }
+      }
+    },
+    "Extensions": {
+      "type": "object",
+      "description": "Free-form, reverse-DNS namespaced extension data. Consumers MUST ignore unknown keys.",
+      "additionalProperties": true
+    }
+  }
+}
