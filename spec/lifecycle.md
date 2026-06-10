@@ -55,7 +55,9 @@ stateDiagram-v2
 8. The `input-required` → `working` transition occurs **only** via
    `tasks/provideInput` (see [`transport.md`](./transport.md)). When entering
    `input-required`, the agent **SHOULD** describe the needed input in the
-   `status` event's `message` field.
+   `status` event's `message` field (human-readable), and **MAY** additionally
+   supply a structured ask in the `prompt` field (an array of `Part`s) when the
+   request needs richer content than a single string.
 
 ## Events emitted per state
 

@@ -3,5 +3,9 @@
   "taskId": "task_01HZX9K3M7Q",
   "state": "input-required",
   "message": "Should I include sources behind paywalls? Please confirm scope.",
+  "prompt": [
+    { "kind": "text", "text": "Confirm research scope before I continue." },
+    { "kind": "json", "json": { "options": ["open-access-only", "include-paywalled"], "default": "open-access-only" }, "mediaType": "application/json" }
+  ],
   "timestamp": "2026-06-10T07:00:20Z"
 }

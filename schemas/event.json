@@ -20,6 +20,11 @@
         "taskId": { "type": "string" },
         "state": { "$ref": "https://agentcompose.dev/schemas/common.json#/$defs/TaskState" },
         "message": { "type": "string", "description": "Optional human-readable detail. When state is input-required, SHOULD describe what input is needed." },
+        "prompt": {
+          "type": "array",
+          "items": { "$ref": "https://agentcompose.dev/schemas/common.json#/$defs/Part" },
+          "description": "Structured input request. MAY be present when state is input-required to ask for input with rich content (beyond the human-readable message)."
+        },
         "timestamp": { "type": "string", "format": "date-time" }
       },
       "required": ["type", "taskId", "state"],
