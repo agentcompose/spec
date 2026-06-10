@@ -82,8 +82,18 @@ Rules:
    values **redacted** (never echo resolved secrets).
 4. `agent/configure` **SHOULD** be called before the first `tasks/submit`.
    Configuration scope per binding is defined in §7.
-5. Configuration is **instance-level**, not per task. Per-task parameters are a
-   separate concern (a future revision).
+5. Configuration is **instance-level**, not per task: a configured instance holds
+   its configuration across the tasks submitted to it.
+6. **Per-use overlay (orchestrator note).** An orchestrator that drives one instance
+   across many steps MAY layer a *per-use* configuration over the instance's base
+   configuration for a single task, by calling `agent/configure` with the merged
+   result before that `tasks/submit`. The overlay is a convenience for composition
+   (e.g. a master agent tuning a sub-agent per delegation); it does not change the
+   instance-level model — the agent still sees one effective configuration per task.
+   Because a single instance holds one configuration at a time, overlaying distinct
+   per-use configs on a *shared* instance is inherently sequential; concurrent,
+   differing per-use configuration requires separate instances (or sessions, a
+   future revision).
 
 ## 5. Well-known configuration keys
 
