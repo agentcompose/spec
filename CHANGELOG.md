@@ -5,6 +5,18 @@ is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 project adheres to [Semantic Versioning](https://semver.org). See
 [VERSIONING.md](./VERSIONING.md) for how changes are classified.
 
+## [Unreleased]
+
+### Changed
+- **Clarified `result` vs `artifacts` consumption semantics** (documentation only — no
+  schema or wire change). `result.parts` is the canonical, composable output a caller
+  (including a composing orchestrator) consumes; `artifacts` are tangible byproducts
+  surfaced for observability and are not guaranteed to be consumed downstream. Anything
+  a downstream consumer needs MUST be returned as a `Part` in the result (a file to hand
+  onward is a file `Part`, not only an artifact). Sharpened the `Result`/`Artifact`
+  schema descriptions, added a note in the specification (§5), and a guidance note in the
+  authoring guide.
+
 ## [0.1.1] - 2026-06-10
 
 ### Added

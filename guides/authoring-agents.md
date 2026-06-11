@@ -118,3 +118,13 @@ defineAgent({
 
 If your real adapter looks roughly like this — thin, declarative, mostly
 translation — you're at the right altitude.
+
+> **Return everything valuable as `result` parts.** The value you `return` becomes the
+> task's `result.parts` — the canonical, composable output a caller (including an
+> orchestrator that chains you into the next agent) consumes. `ctx.artifact(…)` is for
+> tangible byproducts (files, diffs, logs) surfaced for observability; **artifacts are
+> not guaranteed to be fed downstream.** A `Part` is polymorphic — text, json, **or a
+> file** (`{ kind: "file", name, mediaType, bytes|uri }`) — so when your deliverable *is*
+> a file, that file simply **is** a file `Part` in your result; you need **not** also emit
+> it as an artifact (no duplication). Reserve artifacts for intermediate outputs you want
+> visible along the way but that are not the answer.

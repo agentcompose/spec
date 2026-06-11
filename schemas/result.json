@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://agentcompose.dev/schemas/result.json",
   "title": "Result",
-  "description": "The successful outcome of a completed task.",
+  "description": "The successful, canonical outcome of a completed task: the output a caller — including a composing orchestrator — consumes. Anything a downstream consumer needs MUST appear here as Part(s); a file to hand onward is a file Part, not only an artifact.",
   "type": "object",
   "required": ["parts"],
   "additionalProperties": false,

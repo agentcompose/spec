@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://agentcompose.dev/schemas/artifact.json",
   "title": "Artifact",
-  "description": "A tangible output produced during or after a task.",
+  "description": "A tangible byproduct produced during or after a task (e.g. a file, diff, log, or chart), surfaced for observability and human use. Artifacts are NOT guaranteed to be consumed by a composing caller: to hand data to a downstream agent, return it in the task's Result parts.",
   "type": "object",
   "required": ["id", "parts"],
   "additionalProperties": false,

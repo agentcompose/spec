@@ -169,6 +169,15 @@ The agent responds with a **Task** object that validates against
 | `error` | Error? | Present when terminal and failed. |
 | `artifacts` | Artifact[] | Outputs produced so far. |
 
+> **`result` vs `artifacts` (consumption semantics).** The `result` is the canonical,
+> composable output: a caller — including an orchestrator that feeds one agent's output
+> into the next — consumes `result.parts`. `artifacts` are tangible byproducts surfaced
+> for observability and human use and are **NOT guaranteed to be consumed** by a composing
+> caller. Therefore: if a value is part of the answer (or a later agent needs it), it
+> **MUST** be in `result.parts` — a file to hand onward is returned as a file `Part`
+> (`Part`s are polymorphic: text, json, or file), **not** only as an artifact. A file
+> deliverable simply *is* a file `Part`; there is no need to also emit it as an artifact.
+
 ---
 
 ## 6. Task lifecycle
